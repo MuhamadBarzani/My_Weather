@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:myweather/pages/mywidgets/addinfocard.dart';
@@ -15,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final String apiKey = "768c1f4d474d3dc010d3d5a0849e8bc5";
+  final String apiKey = dotenv.env['API_KEY']!;
   late Future<Map<String, dynamic>> weatherData;
   final TextEditingController cityController = TextEditingController();
   String cityName = "Erbil"; // Default city
