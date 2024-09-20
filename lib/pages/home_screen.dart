@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       return weatherData;
     } catch (e) {
-      print(e.toString());
+      throw e.toString();
     }
   }
 
@@ -54,8 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
           bool connection = true;
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator.adaptive());
-          }
-          if (snapshot.hasError) {
+          } else if (snapshot.hasError) {
             connection = false;
           }
           final data = snapshot.data!;
