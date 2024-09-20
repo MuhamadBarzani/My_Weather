@@ -17,17 +17,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final String apiKey = "768c1f4d474d3dc010d3d5a0849e8bc5";
   late Future<Map<String, dynamic>> weatherData;
+  final TextEditingController cityController = TextEditingController();
+  String cityName = "Erbil"; // Default city
 
   @override
   void initState() {
     super.initState();
-    weatherData = getWeatherData();
+    weatherData = getWeatherData(cityName);
   }
 
-  Future<Map<String, dynamic>> getWeatherData() async {
-    const String cityName = "Erbil";
+  Future<Map<String, dynamic>> getWeatherData(String city) async {
     final response = await http.get(Uri.parse(
-        "https://api.openweathermap.org/data/2.5/forecast?q=$cityName&APPID=$apiKey"));
+        "https://api.openweathermap.org/data/2.5/forecast?q=$city&APPID=$apiKey"));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -36,24 +37,51 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void updateWeather() {
+    setState(() {
+      cityName = cityController.text.isEmpty ? "Erbil" : cityController.text;
+      weatherData = getWeatherData(cityName); // Update weather data
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-          "Weather Erbil",
+          "Weather App",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                weatherData = getWeatherData(); // Refresh data on button press
-              });
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Enter City Name"),
+                    content: TextField(
+                      controller: cityController,
+                      decoration: const InputDecoration(
+                        hintText: "City Name",
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          updateWeather();
+                          Navigator.of(context).pop(); // Close dialog
+                        },
+                        child: const Text("Submit"),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
-            icon: const Icon(Icons.refresh),
-          )
+            icon: const Icon(Icons.edit_location),
+          ),
         ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
